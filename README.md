@@ -131,6 +131,42 @@ public function rules(): array
 
 The message is `The :attribute field must be a valid name.` and can be translated through your JSON language files.
 
+#### Fixable Mode
+
+By default the rule checks the raw value, so `D’Angelo`, `Mario  Rossi` or `Rossi.` are rejected even though the fixers repair them on save. Enable the fixable mode to accept anything the fixer can turn into a valid name. The rule runs the value through the configured `NameFixer` and applies the same pattern to the result.
+
+```php
+new ValidName(fixable: true);
+
+// With a locale preset, mirroring SanitizedEmail in laravel-email-fixer
+new ValidName(locale: 'it');
+```
+
+Passing a `locale` implies `fixable`. Without it, the fixer from the container is used, so the `locale` and `lazy` options of your config file apply.
+
+| Input | Default | Fixable |
+|-------|---------|---------|
+| `D’Angelo`, `Mario  Rossi`, `Maria - Luisa` | rejected | accepted |
+| `Rossi.`, `Rossi,`, `Ros\u{200B}si` | rejected | accepted |
+| `MARIO ROSSI`, `mario rossi` | accepted | accepted |
+| `Agenzia 2`, `evil.example`, `[x](https://e.example)` | rejected | rejected |
+| `<a href=x>`, `Mario/Rossi`, `Rossi 😀` | rejected | rejected |
+
+The rule still only validates and never changes the request. Pair it with the middleware or the cast to store the fixed value:
+
+```php
+use PlinCode\LaravelNameFixer\Casts\FixedName;
+use PlinCode\LaravelNameFixer\Rules\ValidName;
+
+// Form request: accept what the fixer can repair
+'last_name' => ['required', 'string', 'max:100', new ValidName(fixable: true)],
+
+// Model: the cast stores the fixed value
+'last_name' => FixedName::class,
+```
+
+A value that the fixer cannot repair into a valid name (digits, URLs, markdown, brackets, symbols, emoji) is rejected in both modes. A name that ends up with a leading or trailing hyphen after fixing, such as `Rossi -`, is rejected too.
+
 ## Use Cases
 
 ### Legacy Italian Data

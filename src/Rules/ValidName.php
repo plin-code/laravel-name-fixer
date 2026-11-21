@@ -4,7 +4,7 @@ namespace PlinCode\LaravelNameFixer\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use PlinCode\LaravelNameFixer\NameFixer;
+use PlinCode\LaravelNameFixer\Facades\NameFixer;
 
 class ValidName implements ValidationRule
 {
@@ -28,18 +28,13 @@ class ValidName implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (is_string($value) && $this->fixable) {
-            $value = $this->fixer()->fix($value);
+            $value = $this->locale !== null
+                ? NameFixer::locale($this->locale)->fix($value)
+                : NameFixer::fix($value);
         }
 
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
             $fail('The :attribute field must be a valid name.')->translate();
         }
-    }
-
-    private function fixer(): NameFixer
-    {
-        $fixer = app(NameFixer::class);
-
-        return $this->locale !== null ? $fixer->locale($this->locale) : $fixer;
     }
 }

@@ -5,6 +5,7 @@ namespace PlinCode\LaravelNameFixer;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PlinCode\LaravelNameFixer\Commands\FixNamesCommand;
+use PlinCode\LaravelNameFixer\Facades\NameFixer as NameFixerFacade;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -35,10 +36,10 @@ class NameFixerServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        Str::macro('fixName', fn (string $name): string => app(NameFixer::class)->fix($name));
+        Str::macro('fixName', fn (string $name): string => NameFixerFacade::fix($name));
 
         Stringable::macro('fixName', function (): Stringable {
-            return new Stringable(app(NameFixer::class)->fix($this->value));
+            return new Stringable(NameFixerFacade::fix($this->value));
         });
     }
 }

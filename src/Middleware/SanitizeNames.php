@@ -10,16 +10,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SanitizeNames
 {
+    public function __construct(private readonly NameFixer $fixer) {}
+
     public function handle(Request $request, Closure $next): Response
     {
         $fields = config('name-fixer.middleware.fields', []);
-        $fixer = app(NameFixer::class);
-
         $input = $request->all();
 
         foreach ($input as $key => $value) {
             if (is_string($value) && Str::is($fields, $key)) {
-                $input[$key] = $fixer->fix($value);
+                $input[$key] = $this->fixer->fix($value);
             }
         }
 

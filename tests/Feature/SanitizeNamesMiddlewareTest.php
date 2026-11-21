@@ -8,7 +8,7 @@ function runSanitizeNames(array $input): Request
 {
     $captured = null;
 
-    (new SanitizeNames)->handle(Request::create('/', 'POST', $input), function (Request $request) use (&$captured) {
+    app(SanitizeNames::class)->handle(Request::create('/', 'POST', $input), function (Request $request) use (&$captured) {
         $captured = $request;
 
         return new Response;

@@ -11,8 +11,9 @@ class ValidName implements ValidationRule
     /**
      * Letters (with combining marks) joined by a single space, apostrophe or hyphen.
      * "' " is allowed as a separator for particles like "de' Medici".
+     * The D modifier keeps "$" from matching before a trailing line break.
      */
-    private const PATTERN = "/^\p{L}\p{M}*(?:(?:[ '-]|' )?\p{L}\p{M}*)*'?$/u";
+    private const PATTERN = "/^\p{L}\p{M}*(?:(?:[ '-]|' )?\p{L}\p{M}*)*'?$/Du";
 
     /**
      * @param  bool  $fixable  Accept any value the fixer can repair into a valid name, not only values that are already clean.

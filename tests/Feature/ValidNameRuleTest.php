@@ -35,6 +35,14 @@ it('rejects values that are not names', function (mixed $name) {
     'not a string' => [['Rossi']],
 ]);
 
+it('rejects a name that ends with a line break', function (string $name) {
+    expect(passesValidName($name))->toBeFalse();
+})->with([
+    "Rossi\n",
+    "Rossi\r\n",
+    "Mario\nRossi",
+]);
+
 it('uses a translatable message', function () {
     $validator = Validator::make(['last_name' => 'R0ssi'], ['last_name' => [new ValidName]]);
 
